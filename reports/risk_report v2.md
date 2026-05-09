@@ -3,7 +3,7 @@
 **Portfolio:** Equal-weighted 8-asset basket — AAPL, MSFT, GOOGL, JPM, BRK-B, GLD, TLT, SPY
 **Period analysed:** Jan 2019 – Dec 2024 (1,508 trading days)
 **Portfolio value (assumed):** $1,000,000
-**Author:** [YOUR NAME] | **Date:** [DATE]
+**Author:** Pat Ploypairaoh | **Date:** 4/20/2026
 
 ---
 
