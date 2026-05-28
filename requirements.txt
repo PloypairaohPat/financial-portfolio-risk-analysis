@@ -1,7 +1,10 @@
-yfinance>=0.2.40
-numpy>=1.26
-pandas>=2.0
-scipy>=1.11
-matplotlib>=3.7
-jupyter>=1.0
-jupyterlab>=4.0
+# Pinned for reproducibility. Tested on Python 3.11+.
+# numpy/pandas/scipy/matplotlib pinned to the versions the analysis was verified on.
+# yfinance pinned because its API has had breaking changes across 0.2.x -> 1.x.
+yfinance==0.2.66
+numpy==2.4.4
+pandas==3.0.2
+scipy==1.17.1
+matplotlib==3.10.8
+jupyter==1.1.1
+jupyterlab==4.5.7
