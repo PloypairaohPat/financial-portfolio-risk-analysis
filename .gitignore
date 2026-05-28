@@ -22,3 +22,6 @@ ENV/
 Thumbs.db
 .vscode/
 .idea/
+
+# Safety net: data files belong in /data, not /notebooks
+notebooks/*.csv
