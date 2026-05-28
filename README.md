@@ -1,4 +1,4 @@
-# Portfolio Risk Analysis
+# Financial Portfolio Risk Analysis
 
 Quantitative risk analysis system for an 8-asset multi-asset portfolio (US equities, long-duration treasuries, gold). Implements three Value-at-Risk methodologies — historical simulation, parametric (normal), and Monte Carlo with Cholesky decomposition — alongside efficient frontier optimization and Kupiec backtesting validation.
 
@@ -51,7 +51,7 @@ Equal-weight baseline portfolio, $1,000,000 notional:
 ## Repository Structure
 
 ```
-portfolio-risk-analysis/
+financial-portfolio-risk-analysis/
 ├── README.md                         # This file
 ├── LICENSE                           # MIT
 ├── requirements.txt                  # Python dependencies
@@ -77,8 +77,8 @@ Tested on Python 3.11+.
 
 ```bash
 # Clone and set up
-git clone https://github.com/<your-username>/portfolio-risk-analysis.git
-cd portfolio-risk-analysis
+git clone https://github.com/PloypairaohPat/financial-portfolio-risk-analysis.git
+cd financial-portfolio-risk-analysis
 
 # Virtual environment (recommended)
 python -m venv venv
