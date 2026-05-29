@@ -24,6 +24,7 @@ pip install -r requirements.txt && jupyter lab notebooks/00_executive_summary.ip
 - **Fat tails are real, and quantified:** historical 99% VaR ($29,146) exceeds parametric 99% VaR ($24,000) by $5,146. Jarque–Bera p-value ≈ 0 with excess kurtosis +11.6 formally rejects Normality (notebook 03).
 - **Model is statistically valid:** Kupiec proportion-of-failures backtest on a 252-day held-out window — 2 actual breaches against 2.5 expected, p-value 0.73 (notebook 06).
 - **Diversifiers earn their place — with a caveat.** Adding GLD + TLT to a 6-equity equal-weight portfolio cuts 99% VaR by 25% ($38,939 → $29,146) at a 4.16 ppt return cost. The benefit is real but regime-dependent: 2022 broke the bond-equity inverse correlation, and the regime stress test in notebook 03 shows the diversification effect varies sharply across windows.
+- **Dynamic vs static volatility matters in practice.** RiskMetrics-style EWMA VaR (λ = 0.94, notebook 07) moves between ~$9,300 (calm Dec 2019) and ~$96,700 (peak COVID March 2020) — a 10× range that a static $24,000 number averages over. On the 2024 hold-out, EWMA is well-calibrated at 95% (16 breaches vs 12.6 expected, Kupiec p = 0.34) where the static parametric model is **rejected** as over-conservative (5 breaches, p = 0.013).
 - **Concrete recommendation:** SLSQP max-Sharpe with a 25% per-asset cap improves Sharpe from 0.725 → 0.886 without concentrating into a single name. The unconstrained optimum (Sharpe 0.970) loads 90% into AAPL + GLD and is rejected as brittle.
 
 ![Cumulative growth of $1 invested 2019–2024](reports/figures/cumulative_growth.png)
@@ -62,6 +63,12 @@ Equal-weight baseline portfolio, $1,000,000 notional:
 
 ![Rolling 30-day correlation, selected pairs](reports/figures/rolling_correlation.png)
 
+**Dynamic-volatility VaR (EWMA).** The same problem applies to volatility itself, not just correlation — a static σ averages over regimes that genuinely behaved very differently. RiskMetrics-style EWMA volatility (notebook 07) addresses this by computing a separate σₜ for every day via the recursion σ²ₜ = λ·σ²ₜ₋₁ + (1−λ)·r²ₜ₋₁ with λ = 0.94. The result is a daily VaR forecast that *breathes with the market*: 99% VaR moved between $9,272 (calm Dec 2019) and $96,715 (peak COVID March 2020), a 10× range that no static estimate can capture.
+
+![Dynamic vs static 99% VaR — EWMA breathes with the market](reports/figures/ewma_var_timeseries.png)
+
+On the 2024 hold-out, the dynamic estimate is materially better calibrated than the static one. At 95% confidence, EWMA produces 16 breaches against 12.6 expected (Kupiec p = 0.34, not rejected) while the static parametric model is **rejected** as over-conservative (5 breaches, p = 0.013). At 99% confidence the comparison is muddier — both models pass Kupiec, EWMA with 6 breaches against 2.5 expected (p = 0.06) and static with 2 breaches (p = 0.73) — because 252 days yields too few tail observations to sharply distinguish models at the 1% level. The honest reading: EWMA is the better point-in-time model, the 95% test is the one with statistical power, and the static figures should be understood as long-run averages rather than current risk estimates. The natural next iteration is GARCH(1,1), which generalises EWMA by allowing the decay structure to float and adding mean-reversion to a long-run vol level.
+
 ## Methodology
 
 | Method | Description |
@@ -74,6 +81,7 @@ Equal-weight baseline portfolio, $1,000,000 notional:
 | **CVaR / Expected Shortfall** | Mean of returns exceeding the VaR threshold — the regulatory-preferred measure under Basel III. Closed-form under Normality: μ − σ·φ(z)/α. |
 | **Normality diagnostic** | Q-Q plot against the Normal distribution + Jarque–Bera test on skewness and excess kurtosis. |
 | **Kupiec POF test** | Likelihood-ratio test of observed vs expected breach frequency on a held-out 252-day window. |
+| **EWMA dynamic-volatility VaR** | RiskMetrics recursion σ²ₜ = λσ²ₜ₋₁ + (1−λ)r²ₜ₋₁ with λ = 0.94. Produces a daily VaR forecast that adapts to recent volatility, addressing the static-σ limitation that the regime stress test exposes. |
 
 ## Portfolio Composition
 
@@ -103,7 +111,8 @@ financial-portfolio-risk-analysis/
 │   ├── 03_var_analysis.ipynb            # Historical and parametric VaR + Q-Q + Jarque-Bera + regime slice
 │   ├── 04_monte_carlo.ipynb             # 10,000-path MC via Cholesky + convergence check
 │   ├── 05_efficient_frontier.ipynb      # 5,000 random portfolios + SLSQP min-var, max-Sharpe, 25%-cap
-│   └── 06_backtesting.ipynb             # Kupiec POF test on held-out 2024
+│   ├── 06_backtesting.ipynb             # Kupiec POF test on held-out 2024
+│   └── 07_dynamic_volatility_var.ipynb  # EWMA (RiskMetrics, λ = 0.94) dynamic VaR + Kupiec backtest
 ├── data/                                # Cached for offline reproduction; safe to delete to refresh
 │   ├── prices.csv                       # Adjusted close prices
 │   ├── log_returns.csv                  # Daily log returns per asset
@@ -158,7 +167,7 @@ Time-series analysis · probability & statistics · Monte Carlo simulation · co
 
 - All methods calibrated on 2019–2024 — regime-dependent and not guaranteed to generalise.
 - Parametric and Monte Carlo VaR both rest on the Normal assumption; the historical–parametric gap and Jarque–Bera test quantify the error.
-- Covariance matrix is treated as static despite rolling-correlation evidence of regime changes (see `02_portfolio_metrics.ipynb` and the chart above). The 2022 SPY-TLT correlation flip is exactly the kind of structural break a static matrix misses.
+- Covariance matrix is treated as static in the parametric and Monte Carlo methods, despite rolling-correlation evidence of regime changes (see `02_portfolio_metrics.ipynb` and the chart above). The 2022 SPY-TLT correlation flip is exactly the kind of structural break a static matrix misses. Notebook 07's EWMA model addresses this *for volatility* (though not for cross-asset correlations) and is the recommended point-in-time risk estimate; the static figures remain useful as long-run averages.
 - 1-day VaR horizon only; scaling to longer horizons via √t assumes IID returns — which the fat-tail finding above contradicts.
 - No transaction costs, liquidity constraints, or position-size caps imposed in the optimization beyond the 25% per-asset box constraint.
 
