@@ -8,7 +8,7 @@ Quantitative risk analysis system for an 8-asset multi-asset portfolio (US equit
 
 Built on 1,508 trading days of daily returns (2019–2024) spanning the COVID crash, the 2022 rate-hike bear market, and the 2023–24 bull recovery.
 
-> **Read first:** [`reports/Risk Report.md`](reports/Risk%20Report.md) — the 2-page risk report written for a non-technical stakeholder, with concrete portfolio recommendations.
+> **Read first:** [`reports/Risk Report.pdf`](reports/Risk%20Report.pdf) — the polished 2-page risk report for a non-technical stakeholder, with all charts embedded and a concrete portfolio recommendation. ([`Risk Report.md`](reports/Risk%20Report.md) is the source markdown.)
 >
 > **Run first:** [`notebooks/00_executive_summary.ipynb`](notebooks/00_executive_summary.ipynb) — loads cached data and reproduces every chart and headline number below in ~30 seconds.
 
@@ -103,11 +103,14 @@ financial-portfolio-risk-analysis/
 │   ├── log_returns.csv                  # Daily log returns per asset
 │   └── portfolio_returns.csv            # Equal-weight portfolio return series
 └── reports/
-    ├── Risk Report.md                   # Executive summary & recommendation (non-technical)
+    ├── Risk Report.pdf                  # Generated PDF (open this first)
+    ├── Risk Report.md                   # Source markdown with embedded chart references
     └── figures/                         # Hero charts referenced above
 ```
 
 The CSVs in `data/` are committed so the analysis is fully reproducible offline. To refresh from yfinance, delete `data/prices.csv` and re-run `01_data_ingestion.ipynb` — the other CSVs are regenerated downstream.
+
+To regenerate the PDF after editing `Risk Report.md`, run `python build_risk_report_pdf.py` from the repo root (requires `weasyprint` and `markdown`, installed via `requirements.txt`).
 
 ## Running the Analysis
 

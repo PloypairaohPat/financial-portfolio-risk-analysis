@@ -34,7 +34,7 @@ Backtesting on a held-out 2024 test year shows the parametric 99% VaR was well-c
 
 The portfolio was deliberately constructed to include three asset classes — equities, bonds, gold — to observe diversification effects.
 
-*[INSERT: cumulative-growth chart of the 8 assets here]*
+![Cumulative growth of $1 invested in each asset, 2019-01-02 to 2024-12-30](figures/cumulative_growth.png)
 
 ---
 
@@ -48,7 +48,7 @@ The portfolio was deliberately constructed to include three asset classes — eq
 
 The rolling 30-day correlation analysis reveals that cross-asset correlations are not static. SPY-TLT correlation, typically negative (the "bonds hedge equities" regime), flipped positive through much of 2022 as aggressive rate hikes hurt both asset classes simultaneously. SPY-GLD swings between roughly −0.68 and +0.70 across the period. **This is the most important caveat attaching to the parametric VaR results below** — the parametric model assumes a fixed covariance matrix that cannot capture these regime shifts.
 
-*[INSERT: rolling 30-day correlation chart from portfolio_metrics.ipynb]*
+![Rolling 30-day correlation across key asset pairs — SPY-TLT flips positive in 2022](figures/rolling_correlation.png)
 
 ---
 
@@ -68,7 +68,7 @@ All figures below assume a $1,000,000 portfolio; multiply the return figure by p
 
 **CVaR is a larger number than VaR at every confidence level**, as it should be by construction. The historical 99% CVaR of $43,829 is 50% larger than the historical 99% VaR of $29,146 — meaning that on the days the portfolio did breach VaR, the average loss was half again as large as the threshold itself. This is the kind of figure Basel III expects banks to capitalize against, rather than VaR alone.
 
-*[INSERT: return-distribution histogram with VaR lines drawn at 95% and 99%]*
+![Daily portfolio return distribution with Historical and Parametric 99% VaR thresholds](figures/return_distribution_var.png)
 
 ---
 
@@ -87,7 +87,7 @@ Training window: Jan 2019 – Dec 2023 (1,256 days). Test window: Jan–Dec 2024
 
 The most likely cause of the over-conservatism is that the training window (2019–2023) includes the high-volatility COVID and 2022 rate-shock periods, whereas 2024 was a comparatively calm year. A risk model trained on volatile history will over-state risk in calm regimes and vice versa. A production system would address this with a rolling-window or volatility-scaled re-estimation; this is outside the scope of this report but is called out as the natural next step.
 
-*[INSERT: test-period return plot with VaR thresholds and breach days highlighted]*
+![Held-out 2024 test-period returns vs the 99% VaR thresholds estimated on the 2019-2023 training window](figures/backtest_breaches.png)
 
 ---
 
@@ -114,7 +114,7 @@ Two approaches were used. A visualization was generated from 5,000 random Dirich
 | TLT | 12.5% | 35.7% | 0.0% |
 | SPY | 12.5% | 8.7% | 0.0% |
 
-*[INSERT: efficient frontier scatter with max-Sharpe, min-variance, and equal-weight points marked]*
+![Efficient frontier — 5,000 random portfolios coloured by Sharpe, with SLSQP-optimised solutions overlaid](figures/efficient_frontier.png)
 
 ---
 
