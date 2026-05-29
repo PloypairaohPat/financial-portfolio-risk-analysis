@@ -8,3 +8,8 @@ scipy==1.17.1
 matplotlib==3.10.8
 jupyter==1.1.1
 jupyterlab==4.5.7
+# PDF generation for reports/Risk Report.pdf (build_risk_report_pdf.py).
+# xhtml2pdf is pure Python (no native GTK/Pango deps), so the build
+# script works identically on Windows, macOS and Linux.
+markdown==3.7
+xhtml2pdf==0.2.17
