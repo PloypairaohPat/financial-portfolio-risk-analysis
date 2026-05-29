@@ -68,7 +68,25 @@ All figures below assume a $1,000,000 portfolio; multiply the return figure by p
 
 **CVaR is a larger number than VaR at every confidence level**, as it should be by construction. The historical 99% CVaR of $43,829 is 50% larger than the historical 99% VaR of $29,146 — meaning that on the days the portfolio did breach VaR, the average loss was half again as large as the threshold itself. This is the kind of figure Basel III expects banks to capitalize against, rather than VaR alone.
 
+**Diagnostic: Cornish-Fisher modified VaR.** A fourth method was computed as a fat-tail diagnostic. Cornish-Fisher takes the parametric framework and corrects the Normal z-score for the empirical skewness and excess kurtosis of the return series. With sample skewness of −0.54 and excess kurtosis of +11.6, the corrected 99% VaR comes out at $55,856 — substantially *above* the historical figure. This overshoot is not a recommended risk estimate; it is itself the headline finding. The Cornish-Fisher correction is a Taylor-series approximation around the Normal distribution and is reliable for mildly fat-tailed returns, but past roughly K ≈ 6 the cubic moment term begins to dominate. The fact that the correction blows up here means the return distribution is so far from Normal that a moment-based adjustment cannot recover the true tail — a stronger version of the same finding that the historical-parametric gap delivers. The operational implication is unchanged: trust the historical and Monte Carlo numbers for the tail, not parametric.
+
 ![Daily portfolio return distribution with Historical and Parametric 99% VaR thresholds](figures/return_distribution_var.png)
+
+---
+
+### 3.1 Diversification benefit, quantified
+
+A direct counterfactual test isolates the contribution of GLD and TLT — the two non-equity diversifiers in the portfolio. The same equal-weight construction was rebuilt using only the six equity assets (AAPL, BRK-B, GOOGL, JPM, MSFT, SPY) at 1/6 each, then compared to the actual 1/8 portfolio:
+
+| Portfolio | Annualized return | Annualized volatility | 99% VaR | 99% CVaR |
+| --- | ---: | ---: | ---: | ---: |
+| 6-asset (equities only) | 20.87% | 22.40% | $38,939 | $57,353 |
+| **8-asset (with GLD + TLT)** | **16.71%** | **16.82%** | **$29,146** | **$43,829** |
+| Effect of adding GLD + TLT | −4.16 ppt | −5.58 ppt | **−25.1%** | **−23.6%** |
+
+**Adding GLD and TLT cut 99% VaR by roughly $9,800 (25%) and 99% CVaR by a similar magnitude, at a cost of 4.16 percentage points of annualized return.** On a risk-adjusted basis this is a clear win — volatility falls faster than return, and Sharpe improves. The mechanism is in the correlations: TLT correlates −0.20 with the equity-only book over 2019–2024, and GLD correlates +0.08 (essentially zero). Neither is a strong hedge, but both contribute uncorrelated variance.
+
+**The caveat.** The diversification benefit is regime-dependent. The rolling-correlation analysis in Section 2 documents that SPY-TLT flipped positive through much of 2022 as both asset classes sold off into rate hikes; a 2022-style joint sell-off is precisely the regime where this 25% VaR reduction would not be available. The honest framing is: *adding GLD + TLT cut full-period 99% VaR by 25% at a cost of 4.16 ppt return — but the reduction is averaged over regimes in which the diversifiers worked very differently, and the joint sell-off of 2022 remains the live tail risk this allocation is most exposed to.*
 
 ---
 

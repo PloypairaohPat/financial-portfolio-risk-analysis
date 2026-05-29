@@ -23,6 +23,7 @@ pip install -r requirements.txt && jupyter lab notebooks/00_executive_summary.ip
 - **Equal-weight baseline:** 16.71% annualised return, 16.83% annualised volatility, Sharpe 0.725 against a 4.5% risk-free rate.
 - **Fat tails are real, and quantified:** historical 99% VaR ($29,146) exceeds parametric 99% VaR ($24,000) by $5,146. Jarque–Bera p-value ≈ 0 with excess kurtosis +11.6 formally rejects Normality (notebook 03).
 - **Model is statistically valid:** Kupiec proportion-of-failures backtest on a 252-day held-out window — 2 actual breaches against 2.5 expected, p-value 0.73 (notebook 06).
+- **Diversifiers earn their place — with a caveat.** Adding GLD + TLT to a 6-equity equal-weight portfolio cuts 99% VaR by 25% ($38,939 → $29,146) at a 4.16 ppt return cost. The benefit is real but regime-dependent: 2022 broke the bond-equity inverse correlation, and the regime stress test in notebook 03 shows the diversification effect varies sharply across windows.
 - **Concrete recommendation:** SLSQP max-Sharpe with a 25% per-asset cap improves Sharpe from 0.725 → 0.886 without concentrating into a single name. The unconstrained optimum (Sharpe 0.970) loads 90% into AAPL + GLD and is rejected as brittle.
 
 ![Cumulative growth of $1 invested 2019–2024](reports/figures/cumulative_growth.png)
@@ -47,9 +48,13 @@ Equal-weight baseline portfolio, $1,000,000 notional:
 
 ![Daily return distribution with 99% VaR thresholds](reports/figures/return_distribution_var.png)
 
+**Cornish-Fisher diagnostic.** A fourth method — Cornish-Fisher modified VaR — corrects the parametric z-score for the empirical skewness and excess kurtosis (notebook 03). It produces a 99% VaR of $55,856, well *above* the historical figure. The overshoot is informative rather than a recommended estimate: with excess kurtosis at +11.6, the cubic moment-adjustment is being applied at the outer edge of its valid range. The takeaway is that the return distribution is so far from Normal that a moments-based fat-tail correction cannot recover the truth — confirming that the only trustworthy tail estimates come from the empirical historical method or a correlation-preserving Monte Carlo simulation.
+
 **Backtesting result.** On a held-out 2024 test window (252 trading days), the parametric 99% VaR model was well-calibrated: 2 actual breaches against 2.5 expected, Kupiec likelihood-ratio p-value = 0.73 (not rejected). The historical model over-estimated risk in 2024 — a regime-effect artifact of the training window (2019–2023) including the COVID and 2022 rate-shock periods, rather than a model-correctness failure.
 
 **Optimization result.** SLSQP mean-variance optimization identifies a maximum-Sharpe allocation reaching 0.970 (vs 0.725 equal-weight), though the unconstrained optimum concentrates 90% of weight in AAPL and GLD. Adding a 25% per-asset cap as a practical constraint produces a diversified allocation across six assets with Sharpe 0.886 — a small in-sample Sharpe cost (8 basis points) for a far more robust real-world portfolio. A 70/30 blended tilt of equal-weight toward the unconstrained optimum raises Sharpe to 0.823 while preserving diversification across all eight assets and holding 99% VaR essentially flat — the recommendation made in `reports/Risk Report.md`.
+
+**Diversification benefit, quantified.** Notebook 03 isolates the contribution of GLD and TLT directly: re-built as an equal-weighted 6-equity portfolio (AAPL, BRK-B, GOOGL, JPM, MSFT, SPY), the 99% VaR rises to $38,939 — a 25% increase versus the actual $29,146 — while annualised return rises from 16.71% to 20.87%. The diversifiers therefore cut 99% VaR by roughly $9,800 at a cost of 4.16 percentage points of return. The correlations explain why: TLT correlates −0.20 with the equity-only book over 2019–2024, and GLD correlates +0.08 (essentially zero). The benefit is real, but the regime stress test (notebook 03) shows it varies sharply by window — 2022's bond-equity joint sell-off is exactly the regime where the diversification effect collapses.
 
 ![Efficient frontier with SLSQP-optimised portfolios](reports/figures/efficient_frontier.png)
 
@@ -63,6 +68,7 @@ Equal-weight baseline portfolio, $1,000,000 notional:
 | --- | --- |
 | **Historical VaR** | Empirical percentiles of the realised return distribution. No distributional assumptions. |
 | **Parametric VaR** | Closed-form Normal: μ + Φ⁻¹(α)·σ via `scipy.stats.norm.ppf` (robust to any confidence level). |
+| **Cornish-Fisher VaR** | Parametric VaR with the Normal z-score corrected for sample skewness and excess kurtosis. Used as a fat-tail *diagnostic* — when the correction overshoots historical materially, it signals the distribution is so far from Normal that moment-based adjustments break down. |
 | **Monte Carlo VaR** | 10,000 paths sampled from a multivariate Normal with cross-asset correlations preserved via Cholesky decomposition. Convergence verified at 1k / 5k / 10k / 25k / 50k paths. |
 | **Efficient Frontier** | 5,000 Dirichlet-random portfolios for visualization; `scipy.optimize` SLSQP with sum-to-one and non-negativity constraints for clean min-variance and max-Sharpe solutions; box-constrained variant (≤ 25% per asset) for the practical recommendation. |
 | **CVaR / Expected Shortfall** | Mean of returns exceeding the VaR threshold — the regulatory-preferred measure under Basel III. Closed-form under Normality: μ − σ·φ(z)/α. |
