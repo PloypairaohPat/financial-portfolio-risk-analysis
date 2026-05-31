@@ -2,6 +2,7 @@
 
 ![Python](https://img.shields.io/badge/python-3.11+-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+![Tests](https://img.shields.io/badge/tests-30%20passing-brightgreen)
 ![Last commit](https://img.shields.io/github/last-commit/PloypairaohPat/financial-portfolio-risk-analysis)
 
 Quantitative risk analysis system for an 8-asset multi-asset portfolio (US equities, long-duration treasuries, gold). Implements three Value-at-Risk methodologies — historical simulation, parametric (normal), and Monte Carlo with Cholesky decomposition — alongside SLSQP efficient-frontier optimization and Kupiec backtesting validation.
@@ -103,7 +104,21 @@ financial-portfolio-risk-analysis/
 ├── README.md                            # This file
 ├── LICENSE                              # MIT
 ├── requirements.txt                     # Pinned Python dependencies
+├── requirements-dev.txt                 # Dev-only deps (pytest)
+├── pytest.ini                           # Test configuration
 ├── .gitignore
+├── src/                                 # Analytical core — importable package
+│   ├── __init__.py
+│   ├── data.py                          # Data loading + constants
+│   ├── var.py                           # Historical, parametric, CF, MC, EWMA VaR
+│   ├── optimization.py                  # Random frontier + SLSQP max-Sharpe / min-var
+│   └── backtest.py                      # Kupiec POF test
+├── tests/                               # pytest suite — 30 tests covering src/
+│   ├── conftest.py
+│   ├── test_var.py
+│   ├── test_optimization.py
+│   ├── test_backtest.py
+│   └── test_ewma.py
 ├── notebooks/
 │   ├── 00_executive_summary.ipynb       # Hero notebook — open this first
 │   ├── 01_data_ingestion.ipynb          # Download 2019-2024 prices via yfinance
@@ -150,9 +165,20 @@ jupyter lab notebooks/00_executive_summary.ipynb
 
 The numbered notebooks 01–06 step through the analysis in detail. They expect cached CSVs in `data/`, which are already committed; deleting `data/prices.csv` triggers a fresh yfinance download on the next run of `01_data_ingestion.ipynb`.
 
+## Testing
+
+The analytical core lives in `src/` as a reusable Python package — the notebooks remain the narrative layer, while every VaR method, optimiser, and statistical test is independently importable and unit-tested. The test suite (30 tests) exercises sign conventions, the Cholesky identity `L @ Lᵀ = Σ`, parametric VaR against hand-computed values, Monte Carlo reproducibility, the published reference figures (`$24,017` MC VaR at `seed=42`), EWMA causality, and the Kupiec test under degenerate breach counts.
+
+```bash
+pip install -r requirements-dev.txt
+pytest -v
+```
+
+Expected output: `30 passed`.
+
 ## Skills demonstrated
 
-Time-series analysis · probability & statistics · Monte Carlo simulation · constrained optimization (SLSQP) · statistical hypothesis testing (Jarque–Bera, Kupiec POF) · financial risk modeling · reproducible scientific computing.
+Time-series analysis · probability & statistics · Monte Carlo simulation · constrained optimization (SLSQP) · statistical hypothesis testing (Jarque–Bera, Kupiec POF) · financial risk modeling · modular Python packaging · pytest-driven validation · reproducible scientific computing.
 
 ## Tech Stack
 
